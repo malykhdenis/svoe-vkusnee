@@ -20,7 +20,10 @@ class Subcategory(models.Model):
     """Подкатегории."""
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,)
 
 
 class Product(models.Model):
@@ -29,7 +32,11 @@ class Product(models.Model):
     photo = models.ImageField()
     description = models.TextField()
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL)
+    subcategory = models.ForeignKey(
+        Subcategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        )
 
 
 class FavoriteShop(models.Model):
