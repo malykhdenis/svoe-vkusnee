@@ -35,7 +35,6 @@ class User(AbstractUser):
         verbose_name='Номер телефона',
         max_length=20,
         null=False,
-        unique=True
     )
     
     class Meta:
