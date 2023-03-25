@@ -57,8 +57,8 @@ class Subcategory(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Субкатегория'
-        verbose_name_plural = 'Субкатегории'
+        verbose_name = 'Подкатегория'
+        verbose_name_plural = 'Подкатегории'
 
     def __str__(self):
         return self.name
@@ -107,24 +107,42 @@ class Shop(models.Model):
         verbose_name='Название магазина',
         max_length=200,
         help_text='Введите название магазина',
-        default=None
+        default=None,
     )
     mainstream = models.CharField(
         verbose_name='Основное направление',
         max_length=200,
         help_text='Введите осносное направление магазина',
-        default=None
+        default=None,
     )
     description = models.TextField(
         verbose_name='Описание магазина',
         help_text='Введите описание магазина',
-        default=None
+        default=None,
     )
-    adress = models.CharField(
-        verbose_name='Адрес',
-        max_length=200,
-        help_text='Введите адрес магазина',
-        default=None
+    region = models.CharField(
+        verbose_name='Регион',
+        max_length=50,
+        help_text='Введите регион',
+        default=None,
+    )
+    city = models.CharField(
+        verbose_name='Город',
+        max_length=50,
+        help_text='Введите город',
+        default=None,
+    )
+    street = models.CharField(
+        verbose_name='Улица',
+        max_length=50,
+        help_text='Введите название улицы',
+        default=None,
+    )
+    house = models.CharField(
+        verbose_name='Номер дома',
+        max_length=10,
+        help_text='Введите номер дома',
+        default=None,
     )
     owner = models.ForeignKey(
         User,
