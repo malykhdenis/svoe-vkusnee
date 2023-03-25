@@ -6,7 +6,6 @@ User = get_user_model()
 
 class Category(models.Model):
     """Категории."""
-
     name = models.CharField(
         verbose_name='Название категории',
         max_length=200,
@@ -108,24 +107,24 @@ class Shop(models.Model):
         verbose_name='Название магазина',
         max_length=200,
         help_text='Введите название магазина',
-        default = None
+        default=None
     )
     mainstream = models.CharField(
         verbose_name='Основное направление',
         max_length=200,
         help_text='Введите осносное направление магазина',
-        default = None
+        default=None
     )
     description = models.TextField(
         verbose_name='Описание магазина',
         help_text='Введите описание магазина',
-        default = None
+        default=None
     )
     adress = models.CharField(
         verbose_name='Адрес',
         max_length=200,
         help_text='Введите адрес магазина',
-        default = None
+        default=None
     )
     owner = models.ForeignKey(
         User,
@@ -133,18 +132,18 @@ class Shop(models.Model):
         verbose_name='Производитель',
         related_name='shops',
         help_text='Производитель',
-        default = None
+        default=None
     )
     history = models.TextField(
         verbose_name='История создания магазина',
         help_text='Введите историю создания магазина',
-        default = None
+        default=None
     )
     coordinates = models.CharField(
         verbose_name='Координаты',
         max_length=200,
         help_text='Введите координаты магазина',
-        default = None
+        default=None
     )
     sertificate = models.BooleanField(default=False)
     sertificate_photo = models.ImageField(
@@ -156,17 +155,17 @@ class Shop(models.Model):
         verbose_name='Где представлен продукт',
         max_length=200,
         help_text='Введите где представлен продукт',
-        default = None
+        default=None
     )
     delivery = models.CharField(
         verbose_name='Доставка',
         max_length=200,
-        default = None
+        default=None
     )
     contacts = models.CharField(
         verbose_name='Контактная информация',
         max_length=200,
-        default = None
+        default=None
     )
     photo = models.ImageField(
         verbose_name='Фотография',
@@ -210,8 +209,7 @@ class Shop(models.Model):
 
 
 class ShopProduct(models.Model):
-    '''Товары магазина'''
-
+    """Товары магазина"""
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
@@ -242,7 +240,6 @@ class ShopProduct(models.Model):
 
 class FavoriteShop(models.Model):
     """Магазин в избранном."""
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -267,7 +264,6 @@ class FavoriteShop(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user} - {self.shop}'
-
 
 
 class FavoriteProduct(models.Model):

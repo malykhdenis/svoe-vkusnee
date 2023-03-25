@@ -1,18 +1,14 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers, status
+from rest_framework import serializers
 from users.models import (Follow,
-                          User,
-)
+                          User,)
 from shops.models import (Shop,
                           Category,
                           Subcategory,
                           Product,
                           ShopProduct,
                           FavoriteShop,
-                          FavoriteProduct
-)
-
-from django.shortcuts import get_object_or_404
+                          FavoriteProduct)
 from drf_extra_fields.fields import Base64ImageField
 
 
@@ -54,7 +50,7 @@ class UserCustomSerializer(UserSerializer):
             'phone_number',
             'is_subscribed'
         )
-    
+
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:

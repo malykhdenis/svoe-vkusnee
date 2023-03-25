@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import (
-    Shop, ShopProduct, Product, Category, Subcategory, FavoriteProduct, FavoriteShop)
+from .models import (Shop, ShopProduct, Product, Category, Subcategory,
+                     FavoriteProduct, FavoriteShop)
 
 
 class ProductInShopAdmin(admin.TabularInline):
