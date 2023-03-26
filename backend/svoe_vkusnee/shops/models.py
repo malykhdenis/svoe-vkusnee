@@ -81,10 +81,6 @@ class Product(models.Model):
         verbose_name='Описание продукта',
         help_text='Введите описание продукта'
     )
-    # shop = models.ForeignKey(
-    #     Shop,
-    #     on_delete=models.CASCADE
-    # )
     subcategory = models.ManyToManyField(
         Subcategory,
         verbose_name='Подкатегория',
@@ -101,13 +97,37 @@ class Product(models.Model):
         return self.name
 
 
+class Messenger(models.Model):
+    """Мессенджеры."""
+    name = models.CharField(
+        verbose_name='Название мессенджера',
+        max_length=100,
+        help_text='Введите название мессенджера',
+        unique=True,
+    )
+    logo = models.ImageField(
+        verbose_name='Логотип',
+        upload_to='shops/images/',
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Мессенджер'
+        verbose_name_plural = 'Мессенджеры'
+
+    def __str__(self):
+        return self.name
+
+
 class Shop(models.Model):
     """Магазины производителей."""
+
     name = models.CharField(
         verbose_name='Название магазина',
         max_length=200,
         help_text='Введите название магазина',
-        default=None,
+        unique=True,
+        # default=None,
     )
     mainstream = models.CharField(
         verbose_name='Основное направление',
@@ -204,17 +224,9 @@ class Shop(models.Model):
         blank=True,
         help_text='Выберите продукты'
     )
-    categorys = models.ManyToManyField(
-        Category,
-        verbose_name='Категории',
-        related_name='магазины',
-        help_text='Выберите категории'
-    )
-    subcategorys = models.ManyToManyField(
-        Subcategory,
-        verbose_name='Подкатегории',
-        related_name='магазины',
-        help_text='Выберите подкатегории'
+    messengers = models.ManyToManyField(
+        Messenger,
+        blank=True,
     )
 
     class Meta:
@@ -289,7 +301,7 @@ class FavoriteProduct(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorite_products'
+        related_name='favorite_products',
     )
     product = models.ForeignKey(
         Product,

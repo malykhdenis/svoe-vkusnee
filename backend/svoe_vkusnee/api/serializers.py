@@ -207,6 +207,7 @@ class ShopSerializer(serializers.ModelSerializer):
             'subcategory',
             'is_favorited_shops',
             'is_favorited_products',
+            'messengers',
         )
 
     def get_products(self, obj):
@@ -259,7 +260,8 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'logo'
             'products',
             'categorys',
-            'subcategorys'
+            'subcategorys',
+            'messengers',
         )
 
     def validate(self, data):
