@@ -234,7 +234,7 @@ class Shop(models.Model):
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
@@ -264,7 +264,7 @@ class ShopProduct(models.Model):
             )
         ]
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f'{self.product} - {self.availability}'
 
 

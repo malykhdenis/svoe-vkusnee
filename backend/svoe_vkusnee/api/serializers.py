@@ -160,17 +160,17 @@ class ShopProductSerializer(serializers.ModelSerializer):
         )
 
 
-class ProductFieldSerializer(serializers.ModelSerializer):
-    """Сериализатор для введения полей продукта при создании магазина."""
+# class ProductFieldSerializer(serializers.ModelSerializer):
+#     """Сериализатор для введения полей продукта при создании магазина."""
 
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(),
-    )
-    availability = serializers.BooleanField()
+#     id = serializers.PrimaryKeyRelatedField(
+#         queryset=Product.objects.all(),
+#     )
+#     availability = serializers.BooleanField()
 
-    class Meta:
-        model = ShopProduct
-        fields = ('id', 'availability')
+#     class Meta:
+#         model = ShopProduct
+#         fields = ('id', 'availability')
 
 
 class ShopSerializer(serializers.ModelSerializer):
@@ -180,8 +180,8 @@ class ShopSerializer(serializers.ModelSerializer):
     subcategory = SubcategorySerializer(many=True, read_only=True)
     owner = UserSerializer(read_only=True, many=False)
     products = serializers.SerializerMethodField()
-    is_favorited_shops = serializers.SerializerMethodField()
-    is_favorited_products = serializers.SerializerMethodField()
+    # is_favorited_shops = serializers.SerializerMethodField()
+    # is_favorited_products = serializers.SerializerMethodField()
     photo = Base64ImageField()
 
     class Meta:
@@ -193,7 +193,6 @@ class ShopSerializer(serializers.ModelSerializer):
             'photo',
             'mainstream',
             'description',
-            'adress',
             'history',
             'coordinates',
             'sertificate',
@@ -205,8 +204,8 @@ class ShopSerializer(serializers.ModelSerializer):
             'products',
             'category',
             'subcategory',
-            'is_favorited_shops',
-            'is_favorited_products',
+            # 'is_favorited_shops',
+            # 'is_favorited_products',
             'messengers',
         )
 
@@ -230,15 +229,15 @@ class ShopSerializer(serializers.ModelSerializer):
 class ShopCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания магазина."""
 
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), many=True
-    )
-    subcategory = serializers.PrimaryKeyRelatedField(
-        queryset=Subcategory.objects.all(), many=True
-    )
-    products = ProductFieldSerializer(many=True)
+    # category = serializers.PrimaryKeyRelatedField(
+    #     queryset=Category.objects.all(), many=True
+    # )
+    # subcategory = serializers.PrimaryKeyRelatedField(
+    #     queryset=Subcategory.objects.all(), many=True
+    # )
+    # products = ProductFieldSerializer(many=True)
     owner = UserCustomSerializer(read_only=True)
-    photo = Base64ImageField()
+    # photo = Base64ImageField()
 
     class Meta:
         model = Shop
@@ -246,51 +245,55 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'id',
             'owner',
             'name',
-            'photo',
+            # 'photo',
             'mainstream',
             'description',
-            'adress',
+            # 'adress',
             'history',
             'coordinates',
+            'city',
+            'house',
+            'region',
+            'street',
             'sertificate',
             'sertificate_photo',
             'presented',
             'delivery',
             'contacts',
-            'logo'
-            'products',
-            'categorys',
-            'subcategorys',
+            'logo',
+            # 'products',
+            # 'categorys',
+            # 'subcategorys',
             'messengers',
         )
 
-    def validate(self, data):
-        """Проверка наличия товаров, субкатегорий, категорий."""
-        products = self.initial_data.get('products')
-        if not products:
-            raise serializers.ValidationError({
-                'products': 'Необходимо выбрать товар.'
-            })
+    # def validate(self, data):
+    #     """Проверка наличия товаров, субкатегорий, категорий."""
+    #     products = self.initial_data.get('products')
+    #     if not products:
+    #         raise serializers.ValidationError({
+    #             'products': 'Необходимо выбрать товар.'
+    #         })
 
-        products_id = [product['id'] for product in products]
-        if len(products_id) != len(set(products_id)):
-            raise serializers.ValidationError({
-                'products': 'товары не должны повторяться.'
-            })
+    #     products_id = [product['id'] for product in products]
+    #     if len(products_id) != len(set(products_id)):
+    #         raise serializers.ValidationError({
+    #             'products': 'товары не должны повторяться.'
+    #         })
 
-        categorys = self.initial_data.get('categorys')
-        if not categorys:
-            raise serializers.ValidationError({
-                'categorys': 'Необходимо выбрать категорию.'
-            })
+    #     categorys = self.initial_data.get('categorys')
+    #     if not categorys:
+    #         raise serializers.ValidationError({
+    #             'categorys': 'Необходимо выбрать категорию.'
+    #         })
 
-        subcategorys = self.initial_data.get('subcategorys')
-        if not subcategorys:
-            raise serializers.ValidationError({
-                'subcategorys': 'Необходимо выбрать субкатегорию.'
-            })
+    #     subcategorys = self.initial_data.get('subcategorys')
+    #     if not subcategorys:
+    #         raise serializers.ValidationError({
+    #             'subcategorys': 'Необходимо выбрать субкатегорию.'
+    #         })
 
-        return data
+    #     return data
 
     def create_products(self, products, shop):
         """Создание товара."""
@@ -314,13 +317,13 @@ class ShopCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создание магазина."""
         owner = self.context.get('request').user
-        categorys = validated_data.pop('categorys')
-        subcategorys = validated_data.pop('subcategorys')
-        products = validated_data.pop('products')
+        # categorys = validated_data.pop('categorys')
+        # subcategorys = validated_data.pop('subcategorys')
+        # products = validated_data.pop('products')
         shop = Shop.objects.create(owner=owner, **validated_data)
-        self.create_categorys(categorys, shop)
-        self.create_subcategorys(subcategorys, shop)
-        self.create_products(products, shop)
+        # self.create_categorys(categorys, shop)
+        # self.create_subcategorys(subcategorys, shop)
+        # self.create_products(products, shop)
         return shop
 
     def update(self, instance, validated_data):

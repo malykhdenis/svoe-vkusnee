@@ -32,7 +32,7 @@ class ShopAdmin(admin.ModelAdmin):
         'categorys__name',
         'subcategorys__name',
         'products__name',)
-    inlines = (ProductInShopAdmin,)
+    # inlines = (ProductInShopAdmin,)
     readonly_fields = ('count_favorite_shops',)
     empty_value_display = '-пусто-'
 
