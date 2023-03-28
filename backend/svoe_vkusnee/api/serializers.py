@@ -221,22 +221,22 @@ class ShopSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.favorites.filter(shop=obj).exists()
+        return user.favorite_shops.filter(shop=obj).exists()
 
     def get_is_favorited_products(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.favorites.filter(product=obj).exists()
+        return user.favorite_products.filter(product=obj).exists()
 
 
 class ShopCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания магазина."""
 
-    category = serializers.PrimaryKeyRelatedField(
+    categorys = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), many=True
     )
-    subcategory = serializers.PrimaryKeyRelatedField(
+    subcategorys = serializers.PrimaryKeyRelatedField(
         queryset=Subcategory.objects.all(), many=True
     )
     products = ProductFieldSerializer(many=True)
@@ -260,7 +260,7 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'presented',
             'delivery',
             'contacts',
-            'logo'
+            'logo',
             'products',
             'categorys',
             'subcategorys'
