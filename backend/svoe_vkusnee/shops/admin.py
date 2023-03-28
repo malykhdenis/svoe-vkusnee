@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import (
-    Shop, ShopProduct, Product, Category, Subcategory, FavoriteProduct, FavoriteShop)
+from .models import (Shop, ShopProduct, Product, Category, Subcategory,
+                     FavoriteProduct, FavoriteShop, Messenger)
 
 
 class ProductInShopAdmin(admin.TabularInline):
@@ -19,21 +19,20 @@ class ShopAdmin(admin.ModelAdmin):
         'name',
         'description',
         'get_products',
-        'get_categorys',
-        'get_subcategorys',
         'contacts',
         'delivery',
         'logo',
         'count_favorite_shops',)
     list_filter = (
-        'name', 'owner',  'categorys', 'subcategorys',)
+        'name',
+        'owner',)
     search_fields = (
         'name',
         'owner__email',
         'categorys__name',
         'subcategorys__name',
         'products__name',)
-    inlines = (ProductInShopAdmin,)
+    # inlines = (ProductInShopAdmin,)
     readonly_fields = ('count_favorite_shops',)
     empty_value_display = '-пусто-'
 
@@ -105,3 +104,9 @@ class ShopProductAdmin(admin.ModelAdmin):
     )
     search_fields = ('shop', 'product')
     list_filter = ('shop', 'product')
+
+
+@admin.register(Messenger)
+class MessengerAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)

@@ -32,7 +32,8 @@ class ShopFilter(django_filters.FilterSet):
 
     class Meta:
         model = Shop
-        fields = ('owner', 'categorys', 'subcategorys', 'is_favorited_shops', 'is_favorited_products', )
+        fields = ('owner', 'categorys', 'subcategorys', 'is_favorited_shops',
+                  'is_favorited_products', )
 
     def filter_is_favorited_shops(self, queryset, name, value):
         user = self.request.user
