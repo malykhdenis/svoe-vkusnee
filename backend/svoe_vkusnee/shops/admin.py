@@ -69,7 +69,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'photo', 'slug')
+    list_display = ('name', 'photo', 'slug',)
     search_fields = ('name',)
     list_filter = ('name',)
     prepopulated_fields = {"slug": ("name",)}
@@ -77,9 +77,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Subcategory)
 class SubcategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'slug')
+    list_display = ('name', 'slug', 'category',)
     search_fields = ('name',)
-    list_filter = ('name',)
+    list_filter = ('category',)
     prepopulated_fields = {"slug": ("name",)}
 
 

@@ -9,7 +9,7 @@ class Category(models.Model):
     name = models.CharField(
         verbose_name='Название категории',
         max_length=200,
-        help_text='Введите название категории'
+        help_text='Введите название категории',
     )
     slug = models.SlugField(
         verbose_name='Слаг',
@@ -19,7 +19,7 @@ class Category(models.Model):
     )
     photo = models.ImageField(
         verbose_name='Картинка',
-        upload_to='shops/images/',
+        upload_to='images/categories/',
         blank=True,
         help_text='Загрузите картинку'
     )
@@ -38,7 +38,8 @@ class Subcategory(models.Model):
     name = models.CharField(
         verbose_name='Название подкатегории',
         max_length=200,
-        help_text='Введите название подкатегории'
+        help_text='Введите название подкатегории',
+        blank=False,
     )
     slug = models.SlugField(
         verbose_name='Слаг',
@@ -51,8 +52,8 @@ class Subcategory(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Категория',
-        related_name='subcategory',
-        help_text='Категория'
+        related_name='subcategories',
+        help_text='Выберите категорию'
     )
 
     class Meta:
@@ -73,7 +74,7 @@ class Product(models.Model):
     )
     photo = models.ImageField(
         verbose_name='Картинка',
-        upload_to='shops/images/',
+        upload_to='images/products/',
         blank=True,
         help_text='Загрузите картинку'
     )
@@ -81,10 +82,12 @@ class Product(models.Model):
         verbose_name='Описание продукта',
         help_text='Введите описание продукта'
     )
-    subcategory = models.ManyToManyField(
+    subcategory = models.ForeignKey(
         Subcategory,
+        on_delete=models.SET_NULL,
+        null=True,
         verbose_name='Подкатегория',
-        related_name='Подкатегории',
+        related_name='products',
         help_text='Выберите подкатегорию'
     )
 
@@ -107,7 +110,7 @@ class Messenger(models.Model):
     )
     logo = models.ImageField(
         verbose_name='Логотип',
-        upload_to='shops/images/',
+        upload_to='images/messengers/',
         blank=True,
     )
 
@@ -122,97 +125,108 @@ class Messenger(models.Model):
 class Shop(models.Model):
     """Магазины производителей."""
 
+    MAINSTREAMS = [
+        ('M_1', 'MAINSTREAM_1'),
+        ('M_2', 'MAINSTREAM_2'),
+        ('M_3', 'MAINSTREAM_3'),
+        ('M_4', 'MAINSTREAM_4'),
+        ('M_5', 'MAINSTREAM_5'),
+    ]
+
     name = models.CharField(
         verbose_name='Название магазина',
         max_length=200,
         help_text='Введите название магазина',
         unique=True,
-        # default=None,
     )
     mainstream = models.CharField(
         verbose_name='Основное направление',
-        max_length=200,
-        help_text='Введите осносное направление магазина',
-        default=None,
+        max_length=3,
+        help_text='Выберите основное направление магазина',
+        choices=MAINSTREAMS,
+        blank=True,
     )
     description = models.TextField(
         verbose_name='Описание магазина',
         help_text='Введите описание магазина',
-        default=None,
+        blank=True,
     )
     region = models.CharField(
         verbose_name='Регион',
         max_length=50,
         help_text='Введите регион',
-        default=None,
+        blank=True,
     )
     city = models.CharField(
         verbose_name='Город',
         max_length=50,
         help_text='Введите город',
-        default=None,
+        blank=True,
     )
     street = models.CharField(
         verbose_name='Улица',
         max_length=50,
         help_text='Введите название улицы',
-        default=None,
+        blank=True,
     )
     house = models.CharField(
         verbose_name='Номер дома',
         max_length=10,
         help_text='Введите номер дома',
-        default=None,
+        blank=True,
     )
     owner = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        verbose_name='Производитель',
+        on_delete=models.SET_NULL,
+        verbose_name='Собственник',
         related_name='shops',
-        help_text='Производитель',
-        default=None
+        help_text='Выберите собственника',
+        default=None,
+        blank=True,
+        null=True,
     )
     history = models.TextField(
         verbose_name='История создания магазина',
         help_text='Введите историю создания магазина',
-        default=None
+        blank=True,
     )
     coordinates = models.CharField(
         verbose_name='Координаты',
         max_length=200,
         help_text='Введите координаты магазина',
-        default=None
-    )
-    sertificate = models.BooleanField(default=False)
-    sertificate_photo = models.ImageField(
-        verbose_name='Сертификат',
-        upload_to='shops/images/',
         blank=True,
     )
-    presented = models.CharField(
-        verbose_name='Где представлен продукт',
-        max_length=200,
-        help_text='Введите где представлен продукт',
-        default=None
+    certificate = models.BooleanField(
+        default=False,
+        verbose_name='Наличие сертификата',
     )
-    delivery = models.CharField(
-        verbose_name='Доставка',
-        max_length=200,
-        default=None
+    certificate_photo = models.ImageField(
+        verbose_name='Сертификат',
+        upload_to='images/certificates/',
+        blank=True,
+    )
+    presented = models.TextField(
+        verbose_name='Где представлен продукт',
+        help_text='Введите где представлен продукт',
+        blank=True,
+    )
+    delivery = models.BooleanField(
+        default=False,
+        verbose_name='Наличие доставки',
     )
     contacts = models.CharField(
         verbose_name='Контактная информация',
         max_length=200,
-        default=None
+        blank=True,
     )
     photo = models.ImageField(
         verbose_name='Фотография',
-        upload_to='shops/images/',
+        upload_to='images/shops/',
         blank=True,
     )
     logo = models.ImageField(
         verbose_name='Логотип',
-        upload_to='shops/images/',
+        upload_to='images/shops_logos/',
         blank=True,
     )
     products = models.ManyToManyField(
@@ -243,13 +257,13 @@ class ShopProduct(models.Model):
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
-        related_name='shop_products',
+        related_name='product',
         verbose_name='Магазин',
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='shop_products',
+        related_name='shop',
         verbose_name='Продукт',
     )
     availability = models.BooleanField(default=False)
@@ -278,7 +292,7 @@ class FavoriteShop(models.Model):
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
-        related_name='favorite_shops'
+        related_name='followers'
     )
 
     class Meta:
@@ -306,7 +320,7 @@ class FavoriteProduct(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='favorite_products'
+        related_name='followers'
     )
 
     class Meta:
