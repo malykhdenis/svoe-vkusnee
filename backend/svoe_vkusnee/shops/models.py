@@ -257,13 +257,13 @@ class ShopProduct(models.Model):
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
-        related_name='product',
+        related_name='products',
         verbose_name='Магазин',
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='shop',
+        related_name='shops',
         verbose_name='Продукт',
     )
     availability = models.BooleanField(default=False)
