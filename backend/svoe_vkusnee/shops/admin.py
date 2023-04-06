@@ -4,6 +4,11 @@ from .models import (Shop, ShopProduct, Product, Category, Subcategory,
                      FavoriteProduct, FavoriteShop, Messenger)
 
 
+admin.site.index_title = 'Свое вкуснее'
+admin.site.site_header = 'SvoeVkusneeAdmin'
+admin.site.site_title = 'svoe_vkusnee_admin'
+
+
 class ProductInShopAdmin(admin.TabularInline):
     model = ShopProduct
     fields = ('product', 'availability')
