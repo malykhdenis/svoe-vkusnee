@@ -12,10 +12,11 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from users.models import Follow, User
 from shops.models import (
-    Shop, Product, FavoriteProduct, FavoriteShop, Category, Subcategory
+    Shop, Product, FavoriteProduct, FavoriteShop, Category, Subcategory,
+    Messenger
 )
 from .pagination import Pagination
-from .filters import ProductFilter, ShopFilter
+from .filters import ProductFilter, ShopFilter, MessengerFilter
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     UserCustomSerializer,
@@ -26,6 +27,7 @@ from .serializers import (
     ShopFieldSerializer,
     SubcategorySerializer,
     CategorySerializer,
+    MessengerSerializer,
 )
 
 
@@ -94,6 +96,17 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = (ProductFilter,)
+    pagination_class = None
+    search_fields = ('^name', )
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class MessengerViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получение списка мессенджеров."""
+
+    queryset = Messenger.objects.all()
+    serializer_class = MessengerSerializer
+    filter_backends = (MessengerFilter,)
     pagination_class = None
     search_fields = ('^name', )
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -181,30 +194,30 @@ class ShopViewSet(viewsets.ModelViewSet):
             return self.delete_from(FavoriteShop, request.user, shop_id)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(
-        detail=True,
-        methods=('post', 'delete'),
-        permission_classes=(IsAuthenticated, )
-    )
+    # @action(
+    #     detail=True,
+    #     methods=('post', 'delete'),
+    #     permission_classes=(IsAuthenticated, )
+    # )
 
-    def favorited_products(self, request, **kwargs):
-        """Добавление товара в избранное или удаление из избранного."""
-        try:
-            product_id = int(self.kwargs.get('pk'))
-        except ValueError:
-            return Response(
-                {
-                    'message': (
-                        'Товар с идентификатором '
-                        f'{self.kwargs.get("pk")} не найден'
-                    )
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+    # def favorited_products(self, request, **kwargs):
+    #     """Добавление товара в избранное или удаление из избранного."""
+    #     try:
+    #         product_id = int(self.kwargs.get('pk'))
+    #     except ValueError:
+    #         return Response(
+    #             {
+    #                 'message': (
+    #                     'Товар с идентификатором '
+    #                     f'{self.kwargs.get("pk")} не найден'
+    #                 )
+    #             },
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
 
-        if request.method == 'POST':
-            return self.add_to(FavoriteProduct, request.user, pk=product_id)
+    #     if request.method == 'POST':
+    #         return self.add_to(FavoriteProduct, request.user, pk=product_id)
 
-        if request.method == 'DELETE':
-            return self.delete_from(FavoriteProduct, request.user, product_id)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    #     if request.method == 'DELETE':
+    #         return self.delete_from(FavoriteProduct, request.user, product_id)
+    #     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

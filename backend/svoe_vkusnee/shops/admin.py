@@ -17,6 +17,13 @@ class ProductInShopAdmin(admin.TabularInline):
     extra = 0
 
 
+class MessengerInShopAdmin(admin.TabularInline):
+    model = ShopMessenger
+    fields = ('messenger', 'search_information')
+    min_num = 1
+    extra = 0
+
+
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
     list_display = (
@@ -25,6 +32,7 @@ class ShopAdmin(admin.ModelAdmin):
         'name',
         'description',
         'get_products',
+        'get_messengers',
         'contacts',
         'delivery',
         'logo',
@@ -38,9 +46,13 @@ class ShopAdmin(admin.ModelAdmin):
         'owner__email',
         'categorys__name',
         'subcategorys__name',
-        'products__name',)
-    # inlines = (ProductInShopAdmin,)
-    # readonly_fields = ('count_favorite_shops',)
+        'products__name',
+        'messengers__name',
+    )
+    inlines = (
+        ProductInShopAdmin, MessengerInShopAdmin,)
+    # inlines = (MessengerInShopAdmin,)
+    readonly_fields = ('count_favorite_shops',)
     empty_value_display = '-пусто-'
 
     @admin.display(description='Собственники')
@@ -62,14 +74,14 @@ class ShopAdmin(admin.ModelAdmin):
         return ', '.join([
             products.name for products in obj.products.all()])
 
-    # @admin.display(description='Количество избранных магазинов')
-    # def count_favorite_shops(self, obj):
-    #     return obj.favorite_shops.count()
+    @admin.display(description='Количество избранных магазинов')
+    def count_favorite_shops(self, obj):
+        return obj.favorite_shops.count()
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('id', 'name', 'description')
     search_fields = ('name',)
     list_filter = ('name',)
 
