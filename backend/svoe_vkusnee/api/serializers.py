@@ -1,14 +1,20 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
+from rest_framework import serializers, status
 from users.models import (Follow,
-                          User,)
+                          User,
+)
 from shops.models import (Shop,
                           Category,
                           Subcategory,
                           Product,
                           ShopProduct,
                           FavoriteShop,
-                          FavoriteProduct)
+                          FavoriteProduct,
+                          ShopMessenger,
+                          Messenger
+)
+
+from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 
 
@@ -50,7 +56,7 @@ class UserCustomSerializer(UserSerializer):
             'phone_number',
             'is_subscribed'
         )
-
+    
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
@@ -78,7 +84,7 @@ class FollowSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'phone_number',
-            'is_subscribed'
+            'is_subscribed',
             'shops'
         )
 
@@ -118,6 +124,17 @@ class ProductSerializer(serializers.ModelSerializer):
             'subcategory'
         )
 
+
+class MessengerSerializer(serializers.ModelSerializer):
+    """Сериализатор для мессенджеров."""
+
+    class Meta:
+        model = Messenger
+        fields = (
+            'id',
+            'name',
+            'logo',
+        )
 
 class SubcategorySerializer(serializers.ModelSerializer):
     """Сериализатор для субкатегории."""
@@ -160,27 +177,56 @@ class ShopProductSerializer(serializers.ModelSerializer):
         )
 
 
-# class ProductFieldSerializer(serializers.ModelSerializer):
-#     """Сериализатор для введения полей продукта при создании магазина."""
+class ProductFieldSerializer(serializers.ModelSerializer):
+    """Сериализатор для введения полей продукта при создании магазина."""
 
-#     id = serializers.PrimaryKeyRelatedField(
-#         queryset=Product.objects.all(),
-#     )
-#     availability = serializers.BooleanField()
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(),
+    )
+    availability = serializers.BooleanField()
 
-#     class Meta:
-#         model = ShopProduct
-#         fields = ('id', 'availability')
+    class Meta:
+        model = ShopProduct
+        fields = ('id', 'availability')
+
+
+class ShopMessengerSerializer(serializers.ModelSerializer):
+    """Сериализатор для мессенджеров магазина."""
+
+    id = serializers.IntegerField(source='messenger.id')
+    name = serializers.CharField(source='messenger.name')
+
+    class Meta:
+        model = ShopMessenger
+        fields = (
+            'id',
+            'name',
+            'search_information'
+        )
+
+
+class MessengerFieldSerializer(serializers.ModelSerializer):
+    """Сериализатор для введения полей мессенджера при создании магазина."""
+
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Messenger.objects.all(),
+    )
+    search_information = serializers.CharField()
+
+    class Meta:
+        model = ShopMessenger
+        fields = ('id', 'search_information')
 
 
 class ShopSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра магазинов."""
 
-    category = CategorySerializer(many=True, read_only=True)
-    subcategory = SubcategorySerializer(many=True, read_only=True)
+    # category = CategorySerializer(many=True, read_only=True)
+    # subcategory = SubcategorySerializer(many=True, read_only=True)
     owner = UserSerializer(read_only=True, many=False)
     products = serializers.SerializerMethodField()
-    # is_favorited_shops = serializers.SerializerMethodField()
+    messengers = serializers.SerializerMethodField()
+    is_favorited_shops = serializers.SerializerMethodField()
     # is_favorited_products = serializers.SerializerMethodField()
     photo = Base64ImageField()
 
@@ -193,6 +239,10 @@ class ShopSerializer(serializers.ModelSerializer):
             'photo',
             'mainstream',
             'description',
+            'region',
+            'city',
+            'street',
+            'house',
             'history',
             'coordinates',
             'sertificate',
@@ -202,9 +252,9 @@ class ShopSerializer(serializers.ModelSerializer):
             'contacts',
             'logo',
             'products',
-            'category',
-            'subcategory',
-            # 'is_favorited_shops',
+            # 'category',
+            # 'subcategory',
+            'is_favorited_shops',
             # 'is_favorited_products',
             'messengers',
         )
@@ -213,31 +263,36 @@ class ShopSerializer(serializers.ModelSerializer):
         products = ShopProduct.objects.filter(shop=obj)
         return ShopProductSerializer(products, many=True).data
 
+    def get_messengers(self, obj):
+        messengers = ShopMessenger.objects.filter(shop=obj)
+        return ShopMessengerSerializer(messengers, many=True).data
+
     def get_is_favorited_shops(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.favorites.filter(shop=obj).exists()
+        return user.favorite_shops.filter(shop=obj).exists()
 
-    def get_is_favorited_products(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.favorites.filter(product=obj).exists()
+    # def get_is_favorited_products(self, obj):
+    #     user = self.context.get('request').user
+    #     if user.is_anonymous:
+    #         return False
+    #     return user.favorite_products.filter(product=obj).exists()
 
 
 class ShopCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания магазина."""
 
-    # category = serializers.PrimaryKeyRelatedField(
+    # categorys = serializers.PrimaryKeyRelatedField(
     #     queryset=Category.objects.all(), many=True
     # )
-    # subcategory = serializers.PrimaryKeyRelatedField(
+    # subcategorys = serializers.PrimaryKeyRelatedField(
     #     queryset=Subcategory.objects.all(), many=True
     # )
-    # products = ProductFieldSerializer(many=True)
+    products = ProductFieldSerializer(many=True)
+    messengers = MessengerFieldSerializer(many=True)
     owner = UserCustomSerializer(read_only=True)
-    # photo = Base64ImageField()
+    photo = Base64ImageField()
 
     class Meta:
         model = Shop
@@ -245,55 +300,52 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'id',
             'owner',
             'name',
-            # 'photo',
+            'photo',
             'mainstream',
             'description',
-            # 'adress',
+            'region',
+            'city',
+            'street',
+            'house',
             'history',
             'coordinates',
-            'city',
-            'house',
-            'region',
-            'street',
             'sertificate',
             'sertificate_photo',
             'presented',
             'delivery',
             'contacts',
             'logo',
-            # 'products',
-            # 'categorys',
-            # 'subcategorys',
+            'products',
             'messengers',
         )
 
-    # def validate(self, data):
-    #     """Проверка наличия товаров, субкатегорий, категорий."""
-    #     products = self.initial_data.get('products')
-    #     if not products:
-    #         raise serializers.ValidationError({
-    #             'products': 'Необходимо выбрать товар.'
-    #         })
+    def validate(self, data):
+        """Проверка наличия товаров, субкатегорий, категорий."""
+        products = self.initial_data.get('products')
+        if not products:
+            raise serializers.ValidationError({
+                'products': 'Необходимо выбрать товар.'
+            })
 
-    #     products_id = [product['id'] for product in products]
-    #     if len(products_id) != len(set(products_id)):
-    #         raise serializers.ValidationError({
-    #             'products': 'товары не должны повторяться.'
-    #         })
+        products_id = [product['id'] for product in products]
+        if len(products_id) != len(set(products_id)):
+            raise serializers.ValidationError({
+                'products': 'товары не должны повторяться.'
+            })
 
-    #     categorys = self.initial_data.get('categorys')
-    #     if not categorys:
-    #         raise serializers.ValidationError({
-    #             'categorys': 'Необходимо выбрать категорию.'
-    #         })
+        # categorys = self.initial_data.get('categorys')
+        # if not categorys:
+        #     raise serializers.ValidationError({
+        #         'categorys': 'Необходимо выбрать категорию.'
+        #     })
 
-    #     subcategorys = self.initial_data.get('subcategorys')
-    #     if not subcategorys:
-    #         raise serializers.ValidationError({
-    #             'subcategorys': 'Необходимо выбрать субкатегорию.'
-    #         })
+        # subcategorys = self.initial_data.get('subcategorys')
+        # if not subcategorys:
+        #     raise serializers.ValidationError({
+        #         'subcategorys': 'Необходимо выбрать субкатегорию.'
+        #     })
 
-    #     return data
+        return data
 
     def create_products(self, products, shop):
         """Создание товара."""
@@ -304,26 +356,39 @@ class ShopCreateSerializer(serializers.ModelSerializer):
                 shop=shop, product=product_id, availability=availability
             )
 
-    def create_categorys(self, categorys, shop):
-        """Создание категорий"""
-        for category in categorys:
-            shop.categorys.add(category)
+    def create_messengers(self, messengers, shop):
+        """Создание мессенджера."""
+        for messenger in messengers:
+            messenger_id = messenger['id']
+            search_information = messenger['search_information']
+            ShopMessenger.objects.create(
+                shop=shop,
+                messenger=messenger_id,
+                search_information = search_information
+            )
 
-    def create_subcategorys(self, subcategorys, shop):
-        """Создание субкатегорий"""
-        for subcategory in subcategorys:
-            shop.subcategorys.add(subcategory)
+    # def create_categorys(self, categorys, shop):
+    #     """Создание категорий"""
+    #     for category in categorys:
+    #         shop.categorys.add(category)
+
+    # def create_subcategorys(self, subcategorys, shop):
+    #     """Создание субкатегорий"""
+    #     for subcategory in subcategorys:
+    #         shop.subcategorys.add(subcategory)
 
     def create(self, validated_data):
         """Создание магазина."""
         owner = self.context.get('request').user
         # categorys = validated_data.pop('categorys')
         # subcategorys = validated_data.pop('subcategorys')
-        # products = validated_data.pop('products')
+        products = validated_data.pop('products')
+        messengers = validated_data.pop('messengers')
         shop = Shop.objects.create(owner=owner, **validated_data)
         # self.create_categorys(categorys, shop)
         # self.create_subcategorys(subcategorys, shop)
-        # self.create_products(products, shop)
+        self.create_products(products, shop)
+        self.create_messengers(messengers, shop)
         return shop
 
     def update(self, instance, validated_data):
@@ -334,7 +399,10 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'description', instance.description)
         instance.mainstream = validated_data.get(
             'mainstream', instance.mainstream)
-        instance.adress = validated_data.get('adress', instance.adress)
+        instance.region = validated_data.get('region', instance.region)
+        instance.city = validated_data.get('city', instance.city)
+        instance.street = validated_data.get('street', instance.street)
+        instance.house = validated_data.get('house', instance.house)
         instance.history = validated_data.get('history', instance.history)
         instance.coordinates = validated_data.get(
             'coordinates', instance.coordinates)
@@ -350,17 +418,21 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'contacts', instance.contacts)
         instance.logo = validated_data.get('logo', instance.logo)
 
-        instance.categorys.clear()
-        categorys = validated_data.get('categorys')
-        self.create_categorys(categorys, instance)
+        # instance.categorys.clear()
+        # categorys = validated_data.get('categorys')
+        # self.create_categorys(categorys, instance)
 
-        instance.subcategorys.clear()
-        subcategorys = validated_data.get('subcategorys')
-        self.create_subcategorys(subcategorys, instance)
+        # instance.subcategorys.clear()
+        # subcategorys = validated_data.get('subcategorys')
+        # self.create_subcategorys(subcategorys, instance)
 
         ShopProduct.objects.filter(shop=instance).all().delete()
         products = validated_data.get('products')
         self.create_products(products, instance)
+
+        ShopMessenger.objects.filter(shop=instance).all().delete()
+        messengers = validated_data.get('messengers')
+        self.create_messengers(messengers, instance)
 
         instance.save()
         return instance
