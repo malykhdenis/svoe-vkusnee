@@ -257,6 +257,41 @@ class Shop(models.Model):
         return self.name
 
 
+class ShopMessenger(models.Model):
+    """Мессенджеры магазина"""
+    shop = models.ForeignKey(
+        Shop,
+        on_delete=models.CASCADE,
+        related_name='related_to_messenger',
+        verbose_name='Магазин',
+    )
+    messenger = models.ForeignKey(
+        Messenger,
+        on_delete=models.CASCADE,
+        related_name='related_to_shop',
+        verbose_name='Месенджер',
+    )
+    search_information = models.CharField(
+        verbose_name='Логин мессенджера',
+        max_length=100,
+        help_text='Введите логин мессенджера',
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Мессенджер магазина'
+        verbose_name_plural = 'Мессенджеры магазина'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['shop', 'product'],
+                name='unique_messenger_product'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.shop.name} в {self.messenger}'
+
+
 class ShopProduct(models.Model):
     """Товары магазина"""
     shop = models.ForeignKey(
@@ -285,28 +320,6 @@ class ShopProduct(models.Model):
 
     def __str__(self):
         return f'{self.product} - {self.availability}'
-
-
-class ShopMessenger(models.Model):
-    """Мессенджеры магазина"""
-    shop = models.ForeignKey(
-        Shop,
-        on_delete=models.CASCADE,
-        related_name='shop_messenger',
-        verbose_name='Магазин',
-    )
-    messenger = models.ForeignKey(
-        Messenger,
-        on_delete=models.CASCADE,
-        related_name='messenger_shop',
-        verbose_name='Месенджер',
-    )
-    search_information = models.CharField(
-        verbose_name='Логин мессенджера',
-        max_length=100,
-        help_text='Введите логин мессенджера',
-        unique=True,
-    )
 
 
 class FavoriteShop(models.Model):

@@ -1,7 +1,8 @@
 from django.contrib import admin
+import django.apps
 
 from .models import (Shop, ShopProduct, Product, Category, Subcategory,
-                     FavoriteProduct, FavoriteShop, Messenger)
+                     FavoriteProduct, FavoriteShop, Messenger, ShopMessenger)
 
 
 admin.site.index_title = 'Свое вкуснее'
@@ -27,7 +28,8 @@ class ShopAdmin(admin.ModelAdmin):
         'contacts',
         'delivery',
         'logo',
-        'count_favorite_shops',)
+        # 'count_favorite_shops',
+    )
     list_filter = (
         'name',
         'owner',)
@@ -38,7 +40,7 @@ class ShopAdmin(admin.ModelAdmin):
         'subcategorys__name',
         'products__name',)
     # inlines = (ProductInShopAdmin,)
-    readonly_fields = ('count_favorite_shops',)
+    # readonly_fields = ('count_favorite_shops',)
     empty_value_display = '-пусто-'
 
     @admin.display(description='Собственники')
@@ -60,9 +62,9 @@ class ShopAdmin(admin.ModelAdmin):
         return ', '.join([
             products.name for products in obj.products.all()])
 
-    @admin.display(description='Количество избранных магазинов')
-    def count_favorite_shops(self, obj):
-        return obj.favorite_shops.count()
+    # @admin.display(description='Количество избранных магазинов')
+    # def count_favorite_shops(self, obj):
+    #     return obj.favorite_shops.count()
 
 
 @admin.register(Product)
@@ -115,3 +117,24 @@ class ShopProductAdmin(admin.ModelAdmin):
 class MessengerAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+
+
+@admin.register(ShopMessenger)
+class ShopMessengerAdmin(admin.ModelAdmin):
+    list_display = ('shop', 'messenger', 'search_information',)
+    search_fields = ('shop', 'messenger')
+    list_filter = ('shop', 'messenger')
+
+
+def all_models_admin():
+    """Регистрирует в admin все модели проекта."""
+    models = django.apps.apps.get_models()
+    for model in models:
+        try:
+            admin.site.register(model)
+        except admin.sites.AlreadyRegistered:
+            pass
+
+
+# uncomment to show all models in admin
+# all_models_admin()
