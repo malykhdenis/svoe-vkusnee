@@ -226,7 +226,12 @@ class Shop(models.Model):
     )
     messengers = models.ManyToManyField(
         Messenger,
+        through='ShopMessenger',
+        through_fields=('shop', 'messenger'),
+        verbose_name='Мессенджеры',
+        related_name='shops',
         blank=True,
+        help_text='Выберите мессенджер'
     )
 
     class Meta:
@@ -266,6 +271,41 @@ class ShopProduct(models.Model):
 
     def __str__(self):
         return f'{self.product} - {self.availability}'
+
+
+class ShopMessenger(models.Model):
+    """Мессенджеры магазина"""
+    shop = models.ForeignKey(
+        Shop,
+        on_delete=models.CASCADE,
+        related_name='shop_messengers',
+        verbose_name='Магазин',
+    )
+    messenger = models.ForeignKey(
+        Messenger,
+        on_delete=models.CASCADE,
+        related_name='shop_messengers',
+        verbose_name='Месенджер',
+    )
+    search_information = models.CharField(
+        verbose_name='Логин мессенджера',
+        max_length=100,
+        help_text='Введите логин мессенджера',
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Мессенджер магазина'
+        verbose_name_plural = 'Мессенджеры магазина'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['shop', 'messenger'],
+                name='unique_shop_messenger'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.messenger} - {self.search_information}'
 
 
 class FavoriteShop(models.Model):

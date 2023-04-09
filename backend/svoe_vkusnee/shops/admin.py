@@ -1,12 +1,19 @@
 from django.contrib import admin
 
 from .models import (Shop, ShopProduct, Product, Category, Subcategory,
-                     FavoriteProduct, FavoriteShop, Messenger)
+                     FavoriteProduct, FavoriteShop, Messenger, ShopMessenger,)
 
 
 class ProductInShopAdmin(admin.TabularInline):
     model = ShopProduct
     fields = ('product', 'availability')
+    min_num = 1
+    extra = 0
+
+
+class MessengerInShopAdmin(admin.TabularInline):
+    model = ShopMessenger
+    fields = ('messenger', 'search_information')
     min_num = 1
     extra = 0
 
@@ -19,6 +26,7 @@ class ShopAdmin(admin.ModelAdmin):
         'name',
         'description',
         'get_products',
+        'get_messengers',
         'contacts',
         'delivery',
         'logo',
@@ -31,8 +39,12 @@ class ShopAdmin(admin.ModelAdmin):
         'owner__email',
         'categorys__name',
         'subcategorys__name',
-        'products__name',)
-    # inlines = (ProductInShopAdmin,)
+        'products__name',
+        'messengers__name',
+    )
+    inlines = (
+        ProductInShopAdmin, MessengerInShopAdmin,)
+    # inlines = (MessengerInShopAdmin,)
     readonly_fields = ('count_favorite_shops',)
     empty_value_display = '-пусто-'
 
@@ -53,7 +65,12 @@ class ShopAdmin(admin.ModelAdmin):
     @admin.display(description='Товары')
     def get_products(self, obj):
         return ', '.join([
-            products.name for products in obj.products.all()])
+            product.name for product in obj.products.all()])
+    
+    @admin.display(description='Мессенджеры')
+    def get_messengers(self, obj):
+        return ', '.join([
+            messenger.name for messenger in obj.messengers.all()])
 
     @admin.display(description='Количество избранных магазинов')
     def count_favorite_shops(self, obj):
@@ -110,3 +127,12 @@ class ShopProductAdmin(admin.ModelAdmin):
 class MessengerAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+
+
+@admin.register(ShopMessenger)
+class ShopMessengerAdmin(admin.ModelAdmin):
+    list_display = (
+        'shop', 'messenger', 'search_information'
+    )
+    search_fields = ('shop', 'messenger')
+    list_filter = ('shop', 'messenger')
