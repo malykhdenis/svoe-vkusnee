@@ -32,7 +32,7 @@ class ShopAdmin(admin.ModelAdmin):
         'name',
         'description',
         'get_products',
-        'get_messengers',
+        # 'get_messengers',
         'contacts',
         'delivery',
         'logo',
