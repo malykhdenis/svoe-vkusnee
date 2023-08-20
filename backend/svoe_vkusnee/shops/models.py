@@ -5,125 +5,110 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    """Категории."""
+    """Categories."""
     name = models.CharField(
-        verbose_name='Название категории',
         max_length=200,
-        help_text='Введите название категории',
+        help_text='enter category name',
     )
     slug = models.SlugField(
-        verbose_name='Слаг',
         max_length=200,
         unique=True,
-        help_text='Введите слаг'
+        help_text='enter slug'
     )
     photo = models.ImageField(
-        verbose_name='Картинка',
         upload_to='images/categories/',
         blank=True,
-        help_text='Загрузите картинку'
+        help_text='download photo'
     )
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
 
     def __str__(self):
         return self.name
 
 
 class Subcategory(models.Model):
-    """Подкатегории."""
+    """Subcategories."""
     name = models.CharField(
-        verbose_name='Название подкатегории',
         max_length=200,
-        help_text='Введите название подкатегории',
+        help_text='enter subcategory name',
         blank=False,
     )
     slug = models.SlugField(
-        verbose_name='Слаг',
         max_length=200,
         unique=True,
-        help_text='Введите слаг'
+        help_text='enter slug'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Категория',
         related_name='subcategories',
-        help_text='Выберите категорию'
+        help_text='choose category'
     )
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Подкатегория'
-        verbose_name_plural = 'Подкатегории'
+        verbose_name_plural = 'subcategories'
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    """Продукты."""
+    """Products."""
     name = models.CharField(
-        verbose_name='Название продута',
         max_length=200,
-        help_text='Введите название продукта'
+        help_text='enter product name'
     )
     photo = models.ImageField(
-        verbose_name='Картинка',
         upload_to='images/products/',
         blank=True,
-        help_text='Загрузите картинку'
+        help_text='download photo'
     )
     description = models.TextField(
-        verbose_name='Описание продукта',
-        help_text='Введите описание продукта'
+        help_text='enter description of product'
     )
     subcategory = models.ForeignKey(
         Subcategory,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Подкатегория',
         related_name='products',
-        help_text='Выберите подкатегорию'
+        help_text='choose subcategory'
     )
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Продукт'
-        verbose_name_plural = 'Продукты'
+        verbose_name_plural = 'products'
 
     def __str__(self):
         return self.name
 
 
 class Messenger(models.Model):
-    """Мессенджеры."""
+    """Messengers."""
     name = models.CharField(
-        verbose_name='Название мессенджера',
         max_length=100,
-        help_text='Введите название мессенджера',
+        help_text='enter name of messanger',
         unique=True,
     )
     logo = models.ImageField(
-        verbose_name='Логотип',
         upload_to='images/messengers/',
         blank=True,
     )
 
     class Meta:
-        verbose_name = 'Мессенджер'
-        verbose_name_plural = 'Мессенджеры'
+        verbose_name_plural = 'messengers'
 
     def __str__(self):
         return self.name
 
 
 class Shop(models.Model):
-    """Магазины производителей."""
+    """Shops."""
 
     MAINSTREAMS = [
         ('M_1', 'MAINSTREAM_1'),
@@ -134,153 +119,136 @@ class Shop(models.Model):
     ]
 
     name = models.CharField(
-        verbose_name='Название магазина',
         max_length=200,
-        help_text='Введите название магазина',
+        help_text='enter name of shop',
         unique=True,
     )
     mainstream = models.CharField(
-        verbose_name='Основное направление',
         max_length=3,
-        help_text='Выберите основное направление магазина',
+        help_text='choose mainstream of shop',
         choices=MAINSTREAMS,
         blank=True,
     )
     description = models.TextField(
-        verbose_name='Описание магазина',
-        help_text='Введите описание магазина',
+        help_text='enter description of shop',
         blank=True,
     )
     region = models.CharField(
-        verbose_name='Регион',
         max_length=50,
-        help_text='Введите регион',
+        help_text='enter region',
         blank=True,
     )
     city = models.CharField(
-        verbose_name='Город',
         max_length=50,
-        help_text='Введите город',
+        help_text='enter city',
         blank=True,
     )
     street = models.CharField(
-        verbose_name='Улица',
         max_length=50,
-        help_text='Введите название улицы',
+        help_text='enter street',
         blank=True,
     )
     house = models.CharField(
-        verbose_name='Номер дома',
         max_length=10,
-        help_text='Введите номер дома',
+        help_text='enter number of house',
         blank=True,
     )
     owner = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        verbose_name='Собственник',
         related_name='shops',
-        help_text='Выберите собственника',
+        help_text='choose an owner',
         default=None,
         blank=True,
         null=True,
     )
     history = models.TextField(
-        verbose_name='История создания магазина',
-        help_text='Введите историю создания магазина',
+        help_text="enter history of shop' creation",
         blank=True,
     )
     coordinates = models.CharField(
-        verbose_name='Координаты',
         max_length=200,
-        help_text='Введите координаты магазина',
+        help_text='enter coordinates of shop',
         blank=True,
     )
     certificate = models.BooleanField(
         default=False,
-        verbose_name='Наличие сертификата',
+        help_text='availability of a certificate',
     )
     certificate_photo = models.ImageField(
-        verbose_name='Сертификат',
+        verbose_name='certificate photo',
         upload_to='images/certificates/',
         blank=True,
     )
     presented = models.TextField(
-        verbose_name='Где представлен продукт',
-        help_text='Введите где представлен продукт',
+        help_text='where the product is presented',
         blank=True,
     )
     delivery = models.BooleanField(
         default=False,
-        verbose_name='Наличие доставки',
+        help_text='availability of delivery',
     )
     contacts = models.CharField(
-        verbose_name='Контактная информация',
         max_length=200,
+        help_text='contact information',
         blank=True,
     )
     photo = models.ImageField(
-        verbose_name='Фотография',
         upload_to='images/shops/',
+        help_text='choose a photo of the product',
         blank=True,
     )
     logo = models.ImageField(
-        verbose_name='Логотип',
         upload_to='images/shops_logos/',
+        help_text='choose a logo',
         blank=True,
     )
     products = models.ManyToManyField(
         Product,
         through='ShopProduct',
         through_fields=('shop', 'product'),
-        verbose_name='Продукты',
         related_name='shops',
         blank=True,
-        help_text='Выберите продукты'
+        help_text='choose products'
     )
     messengers = models.ManyToManyField(
         Messenger,
         through='ShopMessenger',
         through_fields=('shop', 'messenger'),
-        verbose_name='Мессенджеры',
         related_name='shops',
         blank=True,
-        help_text='Выберите мессенджер'
+        help_text='choose messenger'
     )
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Магазин'
-        verbose_name_plural = 'Магазины'
+        verbose_name_plural = 'shops'
 
     def __str__(self):
         return self.name
 
 
 class ShopMessenger(models.Model):
-    """Мессенджеры магазина"""
+    """Shop' messengers."""
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
         related_name='related_to_messenger',
-        verbose_name='Магазин',
     )
     messenger = models.ForeignKey(
         Messenger,
         on_delete=models.CASCADE,
         related_name='related_to_shop',
-        verbose_name='Месенджер',
     )
     search_information = models.CharField(
-        verbose_name='Логин мессенджера',
         max_length=100,
-        help_text='Введите логин мессенджера',
+        help_text='enter login',
         unique=True,
     )
 
     class Meta:
-        verbose_name = 'Мессенджер магазина'
-        verbose_name_plural = 'Мессенджеры магазина'
+        verbose_name = "shop' messenger"
+        verbose_name_plural = "shop' messengers"
         constraints = [
             models.UniqueConstraint(
                 fields=['shop', 'messenger'],
@@ -293,24 +261,22 @@ class ShopMessenger(models.Model):
 
 
 class ShopProduct(models.Model):
-    """Товары магазина"""
+    """Shop' product."""
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
         related_name='product',
-        verbose_name='Магазин',
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
         related_name='shop',
-        verbose_name='Продукт',
     )
     availability = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Продукт магазина'
-        verbose_name_plural = 'Продукты магазина'
+        verbose_name = "Shop' product"
+        verbose_name_plural = "Shop' products"
         constraints = [
             models.UniqueConstraint(
                 fields=['shop', 'product'],
@@ -322,43 +288,8 @@ class ShopProduct(models.Model):
         return f'{self.product} - {self.availability}'
 
 
-# class ShopMessenger(models.Model):
-#     """Мессенджеры магазина"""
-#     shop = models.ForeignKey(
-#         Shop,
-#         on_delete=models.CASCADE,
-#         related_name='shop_messengers',
-#         verbose_name='Магазин',
-#     )
-#     messenger = models.ForeignKey(
-#         Messenger,
-#         on_delete=models.CASCADE,
-#         related_name='shop_messengers',
-#         verbose_name='Месенджер',
-#     )
-#     search_information = models.CharField(
-#         verbose_name='Логин мессенджера',
-#         max_length=100,
-#         help_text='Введите логин мессенджера',
-#         unique=True,
-#     )
-
-#     class Meta:
-#         verbose_name = 'Мессенджер магазина'
-#         verbose_name_plural = 'Мессенджеры магазина'
-#         constraints = [
-#             models.UniqueConstraint(
-#                 fields=['shop', 'messenger'],
-#                 name='unique_shop_messenger'
-#             )
-#         ]
-
-#     def __str__(self):
-#         return f'{self.messenger} - {self.search_information}'
-
-
 class FavoriteShop(models.Model):
-    """Магазин в избранном."""
+    """Favorite shop."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -372,8 +303,8 @@ class FavoriteShop(models.Model):
 
     class Meta:
         ordering = ('user',)
-        verbose_name = 'Избранный магазин'
-        verbose_name_plural = 'Избранные магазины'
+        verbose_name = 'favorite shop'
+        verbose_name_plural = 'favorite shops'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'shop'],
@@ -386,7 +317,7 @@ class FavoriteShop(models.Model):
 
 
 class FavoriteProduct(models.Model):
-    """Продукт в избранном."""
+    """Favorite product."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -400,8 +331,8 @@ class FavoriteProduct(models.Model):
 
     class Meta:
         ordering = ('user',)
-        verbose_name = 'Избранный продукт'
-        verbose_name_plural = 'Избранные продукты'
+        verbose_name = 'favorite product'
+        verbose_name_plural = 'favorite products'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'product'],

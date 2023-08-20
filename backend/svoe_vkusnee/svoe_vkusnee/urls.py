@@ -15,5 +15,5 @@ def runserver_page(request):
 urlpatterns = [
     path('', runserver_page),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')), 
+    path('api/', include('api.urls')),
 ]
