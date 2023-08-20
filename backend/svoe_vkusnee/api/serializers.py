@@ -245,8 +245,8 @@ class ShopSerializer(serializers.ModelSerializer):
             'house',
             'history',
             'coordinates',
-            'sertificate',
-            'sertificate_photo',
+            'certificate',
+            'certificate_photo',
             'presented',
             'delivery',
             'contacts',
@@ -309,8 +309,8 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'house',
             'history',
             'coordinates',
-            'sertificate',
-            'sertificate_photo',
+            'certificate',
+            'certificate_photo',
             'presented',
             'delivery',
             'contacts',
@@ -406,10 +406,10 @@ class ShopCreateSerializer(serializers.ModelSerializer):
         instance.history = validated_data.get('history', instance.history)
         instance.coordinates = validated_data.get(
             'coordinates', instance.coordinates)
-        instance.sertificate = validated_data.get(
-            'sertificate', instance.sertificate)
-        instance.sertificate_photo = validated_data.get(
-            'sertificate_photo', instance.sertificate_photo)
+        instance.certificate = validated_data.get(
+            'certificate', instance.certificate)
+        instance.certificate_photo = validated_data.get(
+            'certificate_photo', instance.certificate_photo)
         instance.presented = validated_data.get(
             'presented', instance.presented)
         instance.delivery = validated_data.get(
